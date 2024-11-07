@@ -36,10 +36,17 @@ async function run() {
     // Pass a copy of cachePaths to avoid mutating the original array as reported by:
     // https://github.com/actions/toolkit/pull/1378
     // TODO: remove this once the underlying bug is fixed.
-    const restoreKey = await cacheProvider.cache.restoreCache(config.cachePaths.slice(), key, [config.restoreKey]);
+    const restoreKey = await cacheProvider.cache.restoreCache(
+      config.cachePaths.slice(),
+      key,
+      [config.restoreKey],
+      { lookupOnly: core.getInput("lookup-only") === "true" }
+    );
     if (restoreKey) {
       const match = restoreKey === key;
-      core.info(`Restored from cache key "${restoreKey}" full match: ${match}.`);
+      core.info(
+        `Restored from cache key "${restoreKey}" full match: ${match}.`
+      );
       if (!match) {
         // pre-clean the target directory on cache mismatch
         for (const workspace of config.workspaces) {
